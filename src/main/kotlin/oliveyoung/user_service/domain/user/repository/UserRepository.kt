@@ -1,87 +1,55 @@
 package oliveyoung.user_service.domain.user.repository
 
 import oliveyoung.user_service.domain.user.entity.User
-import oliveyoung.user_service.domain.user.entity.Role
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import org.springframework.stereotype.Repository
-import java.sql.Statement
 
-@Repository
-class UserRepository {
+/**
+ * User 도메인 Repository 인터페이스
+ * 
+ * DIP(Dependency Inversion Principle) 적용:
+ * - 고수준 모듈(Service)이 저수준 모듈(Repository 구현체)에 의존하지 않음
+ * - 둘 다 추상화(Interface)에 의존
+ */
+interface UserRepository {
     
-    @Autowired
-    private lateinit var jdbcTemplate: JdbcTemplate
+    /**
+     * 새로운 유저 생성
+     * @param user 생성할 유저 (id는 null이어야 함)
+     * @return 생성된 유저 (생성된 id 포함)
+     */
+    fun insert(user: User): User
     
-    private val rowMapper = RowMapper { rs, _ ->
-        User(
-            id = rs.getLong("id"),
-            username = rs.getString("username"),
-            email = rs.getString("email"),
-            password = rs.getString("password"),
-            imageUrl = rs.getString("image_url"),
-            role = Role.valueOf(rs.getString("role")),
-            createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
-            updatedAt = rs.getTimestamp("updated_at").toLocalDateTime(),
-            deletedAt = rs.getTimestamp("deleted_at")?.toLocalDateTime()
-        )
-    }
+    /**
+     * ID로 유저 조회
+     * @param id 유저 ID
+     * @return 유저 또는 null
+     */
+    fun findById(id: Long): User?
     
-    fun insert(user: User): User {
-        require(user.id == null) { "Cannot insert user with existing id" }
-        
-        val sql = """
-            INSERT INTO users (username, email, password, image_url, role, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
-        """.trimIndent()
-        
-        val keyHolder = GeneratedKeyHolder()
-        jdbcTemplate.update({ connection ->
-            val ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-            ps.setString(1, user.username)
-            ps.setString(2, user.email)
-            ps.setString(3, user.password)
-            ps.setString(4, user.imageUrl)
-            ps.setString(5, user.role.name)
-            ps
-        }, keyHolder)
-        
-        val generatedId = keyHolder.key?.toLong() ?: throw IllegalStateException("Failed to get generated ID")
-        return user.copy(id = generatedId)
-    }
+    /**
+     * 이메일로 유저 조회
+     * @param email 이메일
+     * @return 유저 또는 null
+     */
+    fun findByEmail(email: String): User?
     
-    fun findById(id: Long): User? {
-        val sql = "SELECT * FROM users WHERE id = ?"
-        return jdbcTemplate.query(sql, rowMapper, id).firstOrNull()
-    }
+    /**
+     * 유저명으로 유저 조회
+     * @param username 유저명
+     * @return 유저 또는 null
+     */
+    fun findByUsername(username: String): User?
     
-    fun findByEmail(email: String): User? {
-        val sql = "SELECT * FROM users WHERE email = ?"
-        return jdbcTemplate.query(sql, rowMapper, email).firstOrNull()
-    }
+    /**
+     * 여러 ID로 유저 배치 조회
+     * @param ids 유저 ID 목록
+     * @return 유저 목록
+     */
+    fun findAllById(ids: List<Long>): List<User>
     
-    fun findByUsername(username: String): User? {
-        val sql = "SELECT * FROM users WHERE username = ?"
-        return jdbcTemplate.query(sql, rowMapper, username).firstOrNull()
-    }
-    
-    fun findAllById(ids: List<Long>): List<User> {
-        if (ids.isEmpty()) return emptyList()
-
-        val placeholders = ids.joinToString(",") { "?" }
-        val sql = "SELECT * FROM users WHERE id IN ($placeholders)"
-        return jdbcTemplate.query(sql, rowMapper, *ids.toTypedArray())
-    }
-
-    
-    
-    
-    
-    fun existsById(id: Long): Boolean {
-        val sql = "SELECT COUNT(*) FROM users WHERE id = ?"
-        val count = jdbcTemplate.queryForObject(sql, Int::class.java, id) ?: 0
-        return count > 0
-    }
+    /**
+     * ID로 유저 존재 여부 확인
+     * @param id 유저 ID
+     * @return 존재 여부
+     */
+    fun existsById(id: Long): Boolean
 }

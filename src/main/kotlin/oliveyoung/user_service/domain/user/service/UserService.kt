@@ -1,78 +1,23 @@
 package oliveyoung.user_service.domain.user.service
 
-import oliveyoung.user_service.domain.user.dto.*
-import oliveyoung.user_service.domain.user.entity.User
-import oliveyoung.user_service.domain.user.entity.Role
-import oliveyoung.user_service.domain.user.repository.UserRepository
-import oliveyoung.user_service.infrastructure.security.PasswordEncoder
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import java.time.LocalDateTime
+import oliveyoung.user_service.domain.user.dto.RegisterRequest
+import oliveyoung.user_service.domain.user.dto.UserResponse
 
-@Service
-@Transactional(readOnly = true)
-class UserService {
+/**
+ * User 도메인 Service 인터페이스
+ * 
+ * 비즈니스 로직의 추상화:
+ * - Controller는 이 인터페이스에만 의존
+ * - 구현체 변경 시 Controller 수정 불필요
+ * - 테스트 시 Mock 구현체 주입 가능
+ */
+interface UserService {
     
-    @Autowired
-    private lateinit var userRepository: UserRepository
-    @Autowired
-    private lateinit var passwordEncoder: PasswordEncoder
-    
-    @Transactional
-    fun register(request: RegisterRequest): UserResponse {
-        if (userRepository.findByEmail(request.email) != null) {
-            throw IllegalArgumentException("Email already exists")
-        }
-        
-        if (userRepository.findByUsername(request.username) != null) {
-            throw IllegalArgumentException("Username already exists")
-        }
-        
-        val user = User(
-            username = request.username,
-            email = request.email,
-            password = passwordEncoder.encode(request.password),
-            imageUrl = request.image_url,
-            role = request.role ?: Role.USER,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
-        )
-        
-        val savedUser = userRepository.insert(user)
-        return UserResponse.from(savedUser)
-    }
-
-//    @Transactional
-//    fun incrementFollowerCount(userId: Long) {
-//        if (!userRepository.existsById(userId)) {
-//            throw NoSuchElementException("User not found with id: $userId")
-//        }
-//        userRepository.incrementFollowerCount(userId)
-//    }
-//
-//    @Transactional
-//    fun decrementFollowerCount(userId: Long) {
-//        if (!userRepository.existsById(userId)) {
-//            throw NoSuchElementException("User not found with id: $userId")
-//        }
-//        userRepository.decrementFollowerCount(userId)
-//    }
-//
-//    @Transactional
-//    fun incrementFollowingCount(userId: Long) {
-//        if (!userRepository.existsById(userId)) {
-//            throw NoSuchElementException("User not found with id: $userId")
-//        }
-//        userRepository.incrementFollowingCount(userId)
-//    }
-//
-//    @Transactional
-//    fun decrementFollowingCount(userId: Long) {
-//        if (!userRepository.existsById(userId)) {
-//            throw NoSuchElementException("User not found with id: $userId")
-//        }
-//        userRepository.decrementFollowingCount(userId)
-//    }
+    /**
+     * 유저 회원가입
+     * @param request 회원가입 요청 정보
+     * @return 생성된 유저 정보
+     * @throws IllegalArgumentException 이메일 또는 유저명 중복 시
+     */
+    fun register(request: RegisterRequest): UserResponse
 }

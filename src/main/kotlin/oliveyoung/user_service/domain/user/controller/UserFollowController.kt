@@ -4,8 +4,9 @@ import jakarta.validation.Valid
 import oliveyoung.user_service.common.response.pagination.cursor.CursorPaginationParams
 import oliveyoung.user_service.common.response.pagination.cursor.CursorPaginationResponse
 import oliveyoung.user_service.domain.user.dto.follow.FollowRequest
-import oliveyoung.user_service.domain.user.service.UserFollowService
+import oliveyoung.user_service.domain.user.service.UserFollowServiceImpl
 import oliveyoung.user_service.domain.user.dto.*
+import oliveyoung.user_service.domain.user.service.UserFollowService
 import oliveyoung.user_service.presentation.response.ApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

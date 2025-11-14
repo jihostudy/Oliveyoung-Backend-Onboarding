@@ -1,113 +1,90 @@
 package oliveyoung.user_service.domain.user.repository
 
 import oliveyoung.user_service.domain.user.entity.Follow
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.support.GeneratedKeyHolder
-import org.springframework.stereotype.Repository
-import java.sql.Statement
 
-@Repository
-class UserFollowRepository {
-
-    @Autowired
-    private lateinit var jdbcTemplate: JdbcTemplate
-
-    private val rowMapper = RowMapper { rs, _ ->
-        Follow(
-            id = rs.getLong("id"),
-            followerId = rs.getLong("follower_id"),
-            followingId = rs.getLong("following_id"),
-            createdAt = rs.getTimestamp("created_at").toLocalDateTime()
-        )
-    }
-
-    // TODO: Checked!
-    fun save(follow: Follow): Follow {
-        val sql = """
-            INSERT INTO follows (follower_id, following_id, created_at)
-            VALUES (?, ?, NOW())
-        """.trimIndent()
-
-        val keyHolder = GeneratedKeyHolder()
-        jdbcTemplate.update({ connection ->
-            val ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-            ps.setLong(1, follow.followerId)
-            ps.setLong(2, follow.followingId)
-            ps
-        }, keyHolder)
-
-        val generatedId = keyHolder.key?.toLong() ?: throw IllegalStateException("Failed to get generated ID")
-        return follow.copy(id = generatedId)
-    }
-
-    fun delete(follow: Follow) {
-        val sql = "DELETE FROM follows WHERE follower_id = ? AND following_id = ?"
-        jdbcTemplate.update(sql, follow.followerId, follow.followingId)
-    }
-
-    fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean {
-        val sql = "SELECT COUNT(*) FROM follows WHERE follower_id = ? AND following_id = ?"
-        val count = jdbcTemplate.queryForObject(sql, Int::class.java, followerId, followingId) ?: 0
-        return count > 0
-    }
-
-    // TODO: Checked!
-    fun findByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Follow? {
-        val sql = "SELECT * FROM follows WHERE follower_id = ? AND following_id = ?"
-        return jdbcTemplate.query(sql, rowMapper, followerId, followingId).firstOrNull()
-    }
-
-    // 커서 페이지네이션 - 팔로워 목록
-    fun findByFollowingIdOrderByIdDesc(followingId: Long, limit: Int): List<Follow> {
-        val sql = """
-            SELECT * FROM follows 
-            WHERE following_id = ? 
-            ORDER BY id DESC 
-            LIMIT ?
-        """.trimIndent()
-        return jdbcTemplate.query(sql, rowMapper, followingId, limit)
-    }
-
-    fun findByFollowingIdAndIdLessThanOrderByIdDesc(followingId: Long, cursor: Long, limit: Int): List<Follow> {
-        val sql = """
-            SELECT * FROM follows 
-            WHERE following_id = ? AND id < ? 
-            ORDER BY id DESC 
-            LIMIT ?
-        """.trimIndent()
-        return jdbcTemplate.query(sql, rowMapper, followingId, cursor, limit)
-    }
-
-    // 커서 페이지네이션 - 팔로잉 목록
-    fun findByFollowerIdOrderByIdDesc(followerId: Long, limit: Int): List<Follow> {
-        val sql = """
-            SELECT * FROM follows 
-            WHERE follower_id = ? 
-            ORDER BY id DESC 
-            LIMIT ?
-        """.trimIndent()
-        return jdbcTemplate.query(sql, rowMapper, followerId, limit)
-    }
-
-    fun findByFollowerIdAndIdLessThanOrderByIdDesc(followerId: Long, cursor: Long, limit: Int): List<Follow> {
-        val sql = """
-            SELECT * FROM follows 
-            WHERE follower_id = ? AND id < ? 
-            ORDER BY id DESC 
-            LIMIT ?
-        """.trimIndent()
-        return jdbcTemplate.query(sql, rowMapper, followerId, cursor, limit)
-    }
-
-    fun findFollowerIdsByFollowingId(userId: Long): List<Long> {
-        val sql = "SELECT follower_id FROM follows WHERE following_id = ?"
-        return jdbcTemplate.queryForList(sql, Long::class.java, userId)
-    }
-
-    fun findFollowingIdsByFollowerId(userId: Long): List<Long> {
-        val sql = "SELECT following_id FROM follows WHERE follower_id = ?"
-        return jdbcTemplate.queryForList(sql, Long::class.java, userId)
-    }
+/**
+ * UserFollow 도메인 Repository 인터페이스
+ * 
+ * DIP(Dependency Inversion Principle) 적용:
+ * - 고수준 모듈(Service)이 저수준 모듈(Repository 구현체)에 의존하지 않음
+ * - 둘 다 추상화(Interface)에 의존
+ */
+interface UserFollowRepository {
+    
+    /**
+     * 팔로우 관계 저장
+     * @param follow 저장할 팔로우 관계 (id는 null이어야 함)
+     * @return 저장된 팔로우 관계 (생성된 id 포함)
+     */
+    fun save(follow: Follow): Follow
+    
+    /**
+     * 팔로우 관계 삭제
+     * @param follow 삭제할 팔로우 관계
+     */
+    fun delete(follow: Follow)
+    
+    /**
+     * 팔로우 관계 존재 여부 확인
+     * @param followerId 팔로우를 하는 유저 ID
+     * @param followingId 팔로우를 받는 유저 ID
+     * @return 존재 여부
+     */
+    fun existsByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Boolean
+    
+    /**
+     * 팔로우 관계 조회
+     * @param followerId 팔로우를 하는 유저 ID
+     * @param followingId 팔로우를 받는 유저 ID
+     * @return 팔로우 관계 또는 null
+     */
+    fun findByFollowerIdAndFollowingId(followerId: Long, followingId: Long): Follow?
+    
+    /**
+     * 특정 유저의 팔로워 목록 조회 (커서 페이지네이션 - 첫 페이지)
+     * @param followingId 팔로우를 받는 유저 ID
+     * @param limit 조회할 개수
+     * @return 팔로우 관계 목록
+     */
+    fun findByFollowingIdOrderByIdDesc(followingId: Long, limit: Int): List<Follow>
+    
+    /**
+     * 특정 유저의 팔로워 목록 조회 (커서 페이지네이션 - 다음 페이지)
+     * @param followingId 팔로우를 받는 유저 ID
+     * @param cursor 커서 (이 ID보다 작은 것만 조회)
+     * @param limit 조회할 개수
+     * @return 팔로우 관계 목록
+     */
+    fun findByFollowingIdAndIdLessThanOrderByIdDesc(followingId: Long, cursor: Long, limit: Int): List<Follow>
+    
+    /**
+     * 특정 유저의 팔로잉 목록 조회 (커서 페이지네이션 - 첫 페이지)
+     * @param followerId 팔로우를 하는 유저 ID
+     * @param limit 조회할 개수
+     * @return 팔로우 관계 목록
+     */
+    fun findByFollowerIdOrderByIdDesc(followerId: Long, limit: Int): List<Follow>
+    
+    /**
+     * 특정 유저의 팔로잉 목록 조회 (커서 페이지네이션 - 다음 페이지)
+     * @param followerId 팔로우를 하는 유저 ID
+     * @param cursor 커서 (이 ID보다 작은 것만 조회)
+     * @param limit 조회할 개수
+     * @return 팔로우 관계 목록
+     */
+    fun findByFollowerIdAndIdLessThanOrderByIdDesc(followerId: Long, cursor: Long, limit: Int): List<Follow>
+    
+    /**
+     * 특정 유저를 팔로우하는 유저 ID 목록 조회
+     * @param userId 팔로우를 받는 유저 ID
+     * @return 팔로워 ID 목록
+     */
+    fun findFollowerIdsByFollowingId(userId: Long): List<Long>
+    
+    /**
+     * 특정 유저가 팔로우하는 유저 ID 목록 조회
+     * @param userId 팔로우를 하는 유저 ID
+     * @return 팔로잉 ID 목록
+     */
+    fun findFollowingIdsByFollowerId(userId: Long): List<Long>
 }
