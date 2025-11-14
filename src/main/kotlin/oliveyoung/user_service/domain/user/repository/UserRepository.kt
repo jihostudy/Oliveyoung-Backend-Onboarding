@@ -21,11 +21,11 @@ class UserRepository {
             username = rs.getString("username"),
             email = rs.getString("email"),
             password = rs.getString("password"),
-            imageUrl = rs.getString("profile_image_url"),
+            imageUrl = rs.getString("image_url"),
             role = Role.valueOf(rs.getString("role")),
             createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
             updatedAt = rs.getTimestamp("updated_at").toLocalDateTime(),
-            deletedAt = rs.getTimestamp("deleted_at").toLocalDateTime()
+            deletedAt = rs.getTimestamp("deleted_at")?.toLocalDateTime()
         )
     }
     
@@ -33,9 +33,8 @@ class UserRepository {
         require(user.id == null) { "Cannot insert user with existing id" }
         
         val sql = """
-            INSERT INTO users (username, email, password, profile_image_url, role, 
-                               follower_count, following_count, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+            INSERT INTO users (username, email, password, image_url, role, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
         """.trimIndent()
         
         val keyHolder = GeneratedKeyHolder()
@@ -84,25 +83,5 @@ class UserRepository {
         val sql = "SELECT COUNT(*) FROM users WHERE id = ?"
         val count = jdbcTemplate.queryForObject(sql, Int::class.java, id) ?: 0
         return count > 0
-    }
-    
-    fun incrementFollowerCount(userId: Long) {
-        val sql = "UPDATE users SET follower_count = follower_count + 1, updated_at = NOW() WHERE id = ?"
-        jdbcTemplate.update(sql, userId)
-    }
-    
-    fun decrementFollowerCount(userId: Long) {
-        val sql = "UPDATE users SET follower_count = GREATEST(follower_count - 1, 0), updated_at = NOW() WHERE id = ?"
-        jdbcTemplate.update(sql, userId)
-    }
-    
-    fun incrementFollowingCount(userId: Long) {
-        val sql = "UPDATE users SET following_count = following_count + 1, updated_at = NOW() WHERE id = ?"
-        jdbcTemplate.update(sql, userId)
-    }
-    
-    fun decrementFollowingCount(userId: Long) {
-        val sql = "UPDATE users SET following_count = GREATEST(following_count - 1, 0), updated_at = NOW() WHERE id = ?"
-        jdbcTemplate.update(sql, userId)
     }
 }
