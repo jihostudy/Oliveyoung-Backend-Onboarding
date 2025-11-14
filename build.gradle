@@ -20,20 +20,28 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	
+	// Kotlin
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	// Database
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	
+	// Security (비밀번호 암호화)
+	implementation 'org.springframework.security:spring-security-crypto:6.2.1'
+	
+	// Swagger/OpenAPI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	
 }
 
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll '-Xjsr305=strict'
 	}
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }
