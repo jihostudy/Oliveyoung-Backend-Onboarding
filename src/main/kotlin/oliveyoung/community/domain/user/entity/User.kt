@@ -9,7 +9,7 @@ data class User(
     val password: String,
     val imageUrl: String? = null,
     val role: Role = Role.USER,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
     val deletedAt: LocalDateTime? = null, // Soft Delete
 )

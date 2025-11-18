@@ -6,5 +6,5 @@ data class Follow(
     val id: Long? = null,
     val followerId: Long,
     val followingId: Long,
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 )

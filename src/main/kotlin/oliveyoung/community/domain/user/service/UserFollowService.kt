@@ -8,7 +8,6 @@ import oliveyoung.community.domain.user.repository.UserFollowRepository
 import oliveyoung.community.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 /**
  * UserFollowService 구현체
@@ -46,7 +45,6 @@ class UserFollowService(
             Follow(
                 followerId = followerId,
                 followingId = followingId,
-                createdAt = LocalDateTime.now(),
             )
 
         // TODO: follows_history에 팔로우 기록 남기기 (비동기)

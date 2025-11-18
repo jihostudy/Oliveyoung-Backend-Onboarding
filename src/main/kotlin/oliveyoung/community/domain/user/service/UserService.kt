@@ -8,7 +8,6 @@ import oliveyoung.community.infrastructure.security.PasswordEncoder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 /**
  * UserService 구현체
@@ -45,8 +44,6 @@ class UserService {
                 password = passwordEncoder.encode(request.password),
                 imageUrl = request.image_url,
                 role = request.role ?: Role.USER,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now(),
             )
 
         val savedUser: User = userRepository.insert(user)
