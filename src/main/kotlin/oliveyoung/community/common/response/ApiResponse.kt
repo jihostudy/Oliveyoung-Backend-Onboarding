@@ -1,4 +1,4 @@
-package oliveyoung.community.presentation.response
+package oliveyoung.community.common.response
 
 data class ApiResponse<T>(
     val data: T?,

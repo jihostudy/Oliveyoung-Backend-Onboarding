@@ -1,22 +1,55 @@
 package oliveyoung.community.domain.user.service
 
-import oliveyoung.community.domain.user.dto.RegisterRequest
-import oliveyoung.community.domain.user.dto.UserResponse
+import oliveyoung.community.domain.user.dto.request.RegisterRequest
+import oliveyoung.community.domain.user.entity.Role
+import oliveyoung.community.domain.user.entity.User
+import oliveyoung.community.domain.user.repository.UserRepository
+import oliveyoung.community.infrastructure.security.PasswordEncoder
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 /**
- * User 도메인 Service 인터페이스
+ * UserService 구현체
  *
- * 비즈니스 로직의 추상화:
- * - Controller는 이 인터페이스에만 의존
- * - 구현체 변경 시 Controller 수정 불필요
- * - 테스트 시 Mock 구현체 주입 가능
+ * @Service: Spring이 빈으로 등록
+ * UserService 인터페이스의 구현체로 자동 주입됨
  */
-interface UserService {
-    /**
-     * 유저 회원가입
-     * @param request 회원가입 요청 정보
-     * @return 생성된 유저 정보
-     * @throws IllegalArgumentException 이메일 또는 유저명 중복 시
-     */
-    fun register(request: RegisterRequest): UserResponse
+@Service
+@Transactional(readOnly = true)
+class UserService {
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
+    @Transactional
+    fun register(request: RegisterRequest): User {
+        // 이메일 중복 체크
+        if (userRepository.findByEmail(request.email) != null) {
+            throw IllegalArgumentException("Email already exists")
+        }
+
+        // 유저명 중복 체크
+        if (userRepository.findByUsername(request.username) != null) {
+            throw IllegalArgumentException("Username already exists")
+        }
+
+        // 유저 생성
+        val user =
+            User(
+                username = request.username,
+                email = request.email,
+                password = passwordEncoder.encode(request.password),
+                imageUrl = request.image_url,
+                role = request.role ?: Role.USER,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+            )
+
+        val savedUser: User = userRepository.insert(user)
+        return savedUser
+    }
 }

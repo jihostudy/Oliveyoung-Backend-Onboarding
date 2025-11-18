@@ -1,4 +1,4 @@
-package oliveyoung.community.domain.user.dto
+package oliveyoung.community.domain.user.dto.response
 
 import oliveyoung.community.domain.user.entity.User
 

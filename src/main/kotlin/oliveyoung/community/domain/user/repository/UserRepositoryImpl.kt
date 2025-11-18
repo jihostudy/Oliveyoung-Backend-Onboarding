@@ -8,16 +8,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Repository
 import java.sql.Statement
 
-/**
- * UserRepository JDBC Template 구현체
- *
- * @Repository: Spring이 빈으로 등록
- * UserRepository 인터페이스의 구현체로 자동 주입됨
- */
 @Repository
-class UserRepositoryImpl(
-    private val jdbcTemplate: JdbcTemplate,
-) : UserRepository {
+class UserRepositoryImpl : UserRepository {
+    private lateinit var jdbcTemplate: JdbcTemplate
+
     private val rowMapper =
         RowMapper { rs, _ ->
             User(

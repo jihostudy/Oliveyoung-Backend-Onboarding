@@ -1,8 +1,9 @@
 package oliveyoung.community.domain.user.controller
 
 import jakarta.validation.Valid
-import oliveyoung.community.domain.user.dto.RegisterRequest
-import oliveyoung.community.domain.user.dto.UserResponse
+import oliveyoung.community.domain.user.dto.request.RegisterRequest
+import oliveyoung.community.domain.user.dto.response.UserResponse
+import oliveyoung.community.domain.user.entity.User
 import oliveyoung.community.domain.user.service.UserService
 import oliveyoung.community.presentation.response.ApiResponse
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +27,11 @@ class UserController {
     fun register(
         @Valid @RequestBody request: RegisterRequest,
     ): ApiResponse<UserResponse> {
-        val user: UserResponse = userService.register(request)
+        // 회원가입 처리
+        val savedUser: User = userService.register(request)
+
+        // 응답 형태로 변환
+        val user: UserResponse = UserResponse.from(savedUser)
         return ApiResponse.success(user, "회원가입이 완료되었습니다")
     }
 }
