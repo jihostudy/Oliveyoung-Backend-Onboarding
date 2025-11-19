@@ -1,5 +1,6 @@
 package oliveyoung.community.domain.user.controller
 
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.user.dto.request.RegisterRequest
@@ -19,9 +20,10 @@ class UserController {
     @Autowired
     private lateinit var userService: UserService
 
-    /**
-     * 회원가입
-     */
+    @Operation(
+        summary = "회원가입",
+        description = "새로운 사용자를 등록합니다",
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun register(
@@ -35,9 +37,10 @@ class UserController {
         return ApiResponse.success(user, "회원가입이 완료되었습니다")
     }
 
-    /**
-     * 테스트용 - 모든 유저 조회 (ID 오름차순)
-     */
+    @Operation(
+        summary = "테스트용: 모든 유저 조회 (ID 오름차순)",
+        description = "모든 유저를 ID 오름차순으로 조회합니다",
+    )
     @GetMapping("/test/list")
     fun getAllUsersOrderById(): ApiResponse<List<UserResponse>> {
         val users: List<User> = userService.getAllUsersOrderById()
