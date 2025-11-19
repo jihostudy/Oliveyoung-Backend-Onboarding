@@ -2,6 +2,7 @@ package oliveyoung.community.domain.user.repository
 
 import oliveyoung.community.domain.user.entity.Role
 import oliveyoung.community.domain.user.entity.User
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.support.GeneratedKeyHolder
@@ -10,6 +11,7 @@ import java.sql.Statement
 
 @Repository
 class UserRepositoryImpl : UserRepository {
+    @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
 
     private val rowMapper =
@@ -81,5 +83,10 @@ class UserRepositoryImpl : UserRepository {
         val sql = "SELECT COUNT(*) FROM users WHERE id = ? AND deleted_at IS NULL"
         val count = jdbcTemplate.queryForObject(sql, Int::class.java, id) ?: 0
         return count > 0
+    }
+
+    override fun findAllOrderById(): List<User> {
+        val sql = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY id ASC"
+        return jdbcTemplate.query(sql, rowMapper)
     }
 }

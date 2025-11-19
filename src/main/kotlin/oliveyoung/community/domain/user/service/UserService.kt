@@ -49,4 +49,6 @@ class UserService {
         val savedUser: User = userRepository.insert(user)
         return savedUser
     }
+
+    fun getAllUsersOrderById(): List<User> = userRepository.findAllOrderById()
 }

@@ -51,4 +51,10 @@ interface UserRepository {
      * @return 존재 여부
      */
     fun existsById(id: Long): Boolean
+
+    /**
+     * 모든 유저 조회 (ID 오름차순)
+     * @return 유저 목록
+     */
+    fun findAllOrderById(): List<User>
 }

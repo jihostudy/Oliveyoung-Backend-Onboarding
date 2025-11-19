@@ -1,11 +1,11 @@
 package oliveyoung.community.domain.user.controller
 
 import jakarta.validation.Valid
+import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.user.dto.request.RegisterRequest
 import oliveyoung.community.domain.user.dto.response.UserResponse
 import oliveyoung.community.domain.user.entity.User
 import oliveyoung.community.domain.user.service.UserService
-import oliveyoung.community.presentation.response.ApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -33,5 +33,15 @@ class UserController {
         // 응답 형태로 변환
         val user: UserResponse = UserResponse.from(savedUser)
         return ApiResponse.success(user, "회원가입이 완료되었습니다")
+    }
+
+    /**
+     * 테스트용 - 모든 유저 조회 (ID 오름차순)
+     */
+    @GetMapping("/test/list")
+    fun getAllUsersOrderById(): ApiResponse<List<UserResponse>> {
+        val users: List<User> = userService.getAllUsersOrderById()
+        val userResponses: List<UserResponse> = users.map { UserResponse.from(it) }
+        return ApiResponse.success(userResponses)
     }
 }
