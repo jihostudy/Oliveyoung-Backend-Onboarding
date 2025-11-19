@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*
 /**
  * PostDetail Controller
  *
- * 게시글 상세 정보 관련 API (댓글, 좋아요)
+ * 게시글 상세 정보 관련 (댓글, 좋아요)
  */
-@Tag(name = "Post Detail", description = "게시글 상세 API (댓글, 좋아요)")
+@Tag(name = "Post Detail", description = "게시글 상세")
 @RestController
 @RequestMapping("/api/v1/posts/{postId}")
 class PostDetailController(

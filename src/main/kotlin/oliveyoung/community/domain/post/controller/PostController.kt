@@ -32,9 +32,9 @@ class PostController {
     @GetMapping("/{postId}")
     fun getPost(
         @PathVariable postId: Long,
-        @RequestParam(required = false) currentUserId: Long?,
+        @RequestParam(required = false) userId: Long?, // TODO: userId는 쿼리가 아닌, JWT에서 추출하도록 변경
     ): ApiResponse<PostResponse> {
-        val post = postService.getPost(postId, currentUserId)
+        val post = postService.getPost(postId, userId)
         return ApiResponse.success(post)
     }
 
@@ -45,7 +45,7 @@ class PostController {
     @GetMapping
     fun getPosts(
         @RequestParam postIds: String, // CSV형태 -> "1,2,3,4,5"
-        @RequestParam(required = false) currentUserId: Long?,
+        @RequestParam(required = false) userId: Long?,
     ): ApiResponse<List<PostResponse>> {
         val ids =
             postIds
@@ -53,7 +53,7 @@ class PostController {
                 .map { it.trim().toLong() }
                 .take(20) // 최대 20개 제한
 
-        val posts = postService.getPosts(ids, currentUserId)
+        val posts = postService.getPosts(ids, userId)
         return ApiResponse.success(posts)
     }
 }

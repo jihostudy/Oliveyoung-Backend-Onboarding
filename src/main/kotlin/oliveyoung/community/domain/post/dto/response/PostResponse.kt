@@ -1,6 +1,6 @@
 package oliveyoung.community.domain.post.dto.response
 
-import oliveyoung.community.domain.post.entity.Comment
+import oliveyoung.community.common.util.TimeUtils
 import oliveyoung.community.domain.post.entity.Post
 
 /**
@@ -43,56 +43,8 @@ data class PostResponse(
                                 items = comments,
                             ),
                     ),
-                createdAt = post.createdAt.toString(),
-                updatedAt = post.updatedAt.toString(),
-            )
-    }
-}
-
-/**
- * 게시글 반응 정보
- */
-data class PostReactions(
-    val like: LikeReaction,
-    val comment: CommentReaction,
-)
-
-/**
- * 좋아요 반응 정보
- */
-data class LikeReaction(
-    val count: Int,
-    val isLiked: Boolean,
-)
-
-/**
- * 댓글 반응 정보
- */
-data class CommentReaction(
-    val count: Int,
-    val items: List<CommentResponse>,
-)
-
-/**
- * 댓글 응답 DTO
- */
-data class CommentResponse(
-    val id: Long,
-    val userId: Long,
-    val postId: Long,
-    val content: String,
-    val createdAt: String,
-    val updatedAt: String,
-) {
-    companion object {
-        fun from(comment: Comment): CommentResponse =
-            CommentResponse(
-                id = comment.id!!,
-                userId = comment.userId,
-                postId = comment.postId,
-                content = comment.content,
-                createdAt = comment.createdAt.toString(),
-                updatedAt = comment.updatedAt.toString(),
+                createdAt = TimeUtils.toIsoString(post.createdAt),
+                updatedAt = TimeUtils.toIsoString(post.updatedAt),
             )
     }
 }

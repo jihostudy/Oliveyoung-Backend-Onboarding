@@ -15,20 +15,20 @@ interface PostService {
     /**
      * 게시글 단건 조회
      * @param postId 게시글 ID
-     * @param currentUserId 현재 사용자 ID (좋아요 여부 확인용, nullable)
+     * @param userId 현재 사용자 ID (좋아요 여부 확인용, nullable
      */
     fun getPost(
         postId: Long,
-        currentUserId: Long?,
+        userId: Long?,
     ): PostResponse
 
     /**
      * 게시글 목록 조회 (최대 20개)
      * @param postIds 게시글 ID 목록
-     * @param currentUserId 현재 사용자 ID (좋아요 여부 확인용, nullable)
+     * @param userId 현재 사용자 ID (좋아요 여부 확인용, nullable)
      */
     fun getPosts(
         postIds: List<Long>,
-        currentUserId: Long?,
+        userId: Long?,
     ): List<PostResponse>
 }
