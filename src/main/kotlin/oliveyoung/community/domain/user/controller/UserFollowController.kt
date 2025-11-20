@@ -5,7 +5,6 @@ import jakarta.validation.Valid
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.common.response.pagination.cursor.CursorPaginationParams
 import oliveyoung.community.common.response.pagination.cursor.CursorPaginationResponse
-import oliveyoung.community.domain.user.dto.*
 import oliveyoung.community.domain.user.dto.request.FollowRequest
 import oliveyoung.community.domain.user.dto.response.UserResponse
 import oliveyoung.community.domain.user.service.UserFollowService

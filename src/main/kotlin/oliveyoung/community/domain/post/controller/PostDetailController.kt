@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.post.dto.request.CreateCommentRequest
+import oliveyoung.community.domain.post.dto.response.CommentListResponse
 import oliveyoung.community.domain.post.dto.response.CommentResponse
 import oliveyoung.community.domain.post.service.PostDetailService
 import org.springframework.http.HttpStatus
@@ -38,9 +39,10 @@ class PostDetailController(
     @GetMapping("/comments")
     fun getComments(
         @PathVariable postId: Long,
-    ): ApiResponse<List<CommentResponse>> {
+    ): ApiResponse<CommentListResponse> {
         val comments = postDetailService.getComments(postId)
-        return ApiResponse.success(comments)
+        val response = CommentListResponse(items = comments)
+        return ApiResponse.success(response)
     }
 
     // ========== 좋아요 API ==========

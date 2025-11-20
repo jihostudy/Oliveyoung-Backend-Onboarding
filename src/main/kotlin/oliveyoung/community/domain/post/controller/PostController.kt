@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.post.dto.request.CreatePostRequest
+import oliveyoung.community.domain.post.dto.response.PostListResponse
 import oliveyoung.community.domain.post.dto.response.PostResponse
 import oliveyoung.community.domain.post.service.PostService
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,7 +47,7 @@ class PostController {
     fun getPosts(
         @RequestParam postIds: String, // CSV형태 -> "1,2,3,4,5"
         @RequestParam(required = false) userId: Long?,
-    ): ApiResponse<List<PostResponse>> {
+    ): ApiResponse<PostListResponse> {
         val ids =
             postIds
                 .split(",")
@@ -54,6 +55,7 @@ class PostController {
                 .take(20) // 최대 20개 제한
 
         val posts = postService.getPosts(ids, userId)
-        return ApiResponse.success(posts)
+        val response = PostListResponse(items = posts)
+        return ApiResponse.success(response)
     }
 }

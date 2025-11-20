@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.user.dto.request.RegisterRequest
+import oliveyoung.community.domain.user.dto.response.UserListResponse
 import oliveyoung.community.domain.user.dto.response.UserResponse
 import oliveyoung.community.domain.user.entity.User
 import oliveyoung.community.domain.user.service.UserService
@@ -42,9 +43,10 @@ class UserController {
         description = "모든 유저를 ID 오름차순으로 조회합니다",
     )
     @GetMapping("/test/list")
-    fun getAllUsersOrderById(): ApiResponse<List<UserResponse>> {
+    fun getAllUsersOrderById(): ApiResponse<UserListResponse> {
         val users: List<User> = userService.getAllUsersOrderById()
         val userResponses: List<UserResponse> = users.map { UserResponse.from(it) }
-        return ApiResponse.success(userResponses)
+        val response = UserListResponse(items = userResponses)
+        return ApiResponse.success(response)
     }
 }
