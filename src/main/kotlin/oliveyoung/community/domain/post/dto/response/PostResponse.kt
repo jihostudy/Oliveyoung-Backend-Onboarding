@@ -2,13 +2,14 @@ package oliveyoung.community.domain.post.dto.response
 
 import oliveyoung.community.common.util.TimeUtils
 import oliveyoung.community.domain.post.entity.Post
+import oliveyoung.community.domain.user.dto.response.UserResponse
 
 /**
  * 게시글 응답 DTO
  */
 data class PostResponse(
     val id: Long,
-    val userId: Long,
+    val user: UserResponse,
     val title: String,
     val content: String,
     val imageUrl: String?,
@@ -19,6 +20,7 @@ data class PostResponse(
     companion object {
         fun from(
             post: Post,
+            user: UserResponse,
             likeCount: Int = 0,
             isLiked: Boolean = false,
             commentCount: Int = 0,
@@ -26,7 +28,7 @@ data class PostResponse(
         ): PostResponse =
             PostResponse(
                 id = post.id!!,
-                userId = post.userId,
+                user = user,
                 title = post.title,
                 content = post.content,
                 imageUrl = post.imageUrl,

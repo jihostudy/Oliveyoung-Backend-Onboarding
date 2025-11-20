@@ -7,6 +7,8 @@ import oliveyoung.community.domain.feed.repository.FeedRepository
 import oliveyoung.community.domain.feed.service.FeedService
 import oliveyoung.community.domain.post.dto.response.PostResponse
 import oliveyoung.community.domain.post.repository.PostDetailRepository
+import oliveyoung.community.domain.user.dto.response.UserResponse
+import oliveyoung.community.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 class FeedServiceImpl(
     private val feedRepository: FeedRepository,
     private val postDetailRepository: PostDetailRepository,
+    private val userRepository: UserRepository,
 ) : FeedService {
     override fun getFeed(
         userId: Long?,
@@ -57,11 +60,22 @@ class FeedServiceImpl(
                     postDetailRepository.findLikedPostIdsByUserId(it, postIds)
                 }?.toSet() ?: emptySet()
 
+        // User 정보 배치 조회
+        val userIds = posts.map { it.userId }.distinct()
+        val users = userRepository.findAllById(userIds)
+        val userMap = users.associateBy { it.id!! }
+
         // PostResponse로 변환
         val postResponses =
             posts.map { post ->
+                val user =
+                    userMap[post.userId]
+                        ?: throw NoSuchElementException("User not found with id: ${post.userId}")
+                val userResponse = UserResponse.from(user)
+
                 PostResponse.from(
                     post = post,
+                    user = userResponse,
                     likeCount = likeCountMap[post.id!!] ?: 0,
                     isLiked = likedPostIds.contains(post.id),
                     commentCount = commentCountMap[post.id!!] ?: 0,

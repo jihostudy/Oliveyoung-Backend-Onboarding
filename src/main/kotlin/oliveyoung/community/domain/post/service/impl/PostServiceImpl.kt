@@ -7,6 +7,8 @@ import oliveyoung.community.domain.post.entity.Post
 import oliveyoung.community.domain.post.repository.PostDetailRepository
 import oliveyoung.community.domain.post.repository.PostRepository
 import oliveyoung.community.domain.post.service.PostService
+import oliveyoung.community.domain.user.dto.response.UserResponse
+import oliveyoung.community.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 class PostServiceImpl(
     private val postRepository: PostRepository,
     private val postDetailRepository: PostDetailRepository,
+    private val userRepository: UserRepository,
 ) : PostService {
     @Transactional
     override fun createPost(request: CreatePostRequest): PostResponse {
@@ -33,8 +36,15 @@ class PostServiceImpl(
 
         val savedPost = postRepository.insert(post)
 
+        // User 정보 조회
+        val user =
+            userRepository.findById(request.userId)
+                ?: throw NoSuchElementException("User not found with id: ${request.userId}")
+        val userResponse = UserResponse.from(user)
+
         return PostResponse.from(
             post = savedPost,
+            user = userResponse,
             likeCount = 0,
             isLiked = false,
             commentCount = 0,
@@ -67,9 +77,16 @@ class PostServiceImpl(
         // 5. 댓글 수
         val commentCount = comments.size
 
-        // 6. DTO 변환
+        // 6. User 정보 조회
+        val user =
+            userRepository.findById(post.userId)
+                ?: throw NoSuchElementException("User not found with id: ${post.userId}")
+        val userResponse = UserResponse.from(user)
+
+        // 7. DTO 변환
         return PostResponse.from(
             post = post,
+            user = userResponse,
             likeCount = likeCount,
             isLiked = isLiked,
             commentCount = commentCount,
@@ -103,11 +120,22 @@ class PostServiceImpl(
         // 4. 댓글 수 배치 조회 (PostDetailRepository 사용)
         val commentCountMap = postDetailRepository.countCommentsByPostIds(postIds)
 
-        // 5. DTO 변환 (요청 순서 유지)
+        // 5. User 정보 배치 조회
+        val userIds = posts.map { it.userId }.distinct()
+        val users = userRepository.findAllById(userIds)
+        val userMap = users.associateBy { it.id!! }
+
+        // 6. DTO 변환 (요청 순서 유지)
         return postIds.mapNotNull { postId ->
             postMap[postId]?.let { post ->
+                val user =
+                    userMap[post.userId]
+                        ?: throw NoSuchElementException("User not found with id: ${post.userId}")
+                val userResponse = UserResponse.from(user)
+
                 PostResponse.from(
                     post = post,
+                    user = userResponse,
                     likeCount = likeCountMap[postId] ?: 0,
                     isLiked = likedPostIds.contains(postId),
                     commentCount = commentCountMap[postId] ?: 0,
