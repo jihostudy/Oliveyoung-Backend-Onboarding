@@ -7,6 +7,8 @@ import oliveyoung.community.domain.post.entity.Like
 import oliveyoung.community.domain.post.repository.PostDetailRepository
 import oliveyoung.community.domain.post.repository.PostRepository
 import oliveyoung.community.domain.post.service.PostDetailService
+import oliveyoung.community.domain.user.dto.response.UserResponse
+import oliveyoung.community.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 class PostDetailServiceImpl(
     private val postDetailRepository: PostDetailRepository,
     private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
 ) : PostDetailService {
     // ========== Comment 메서드 구현 ==========
 
@@ -41,7 +44,14 @@ class PostDetailServiceImpl(
             )
 
         val savedComment = postDetailRepository.insertComment(comment)
-        return CommentResponse.from(savedComment)
+
+        // User 정보 조회
+        val user =
+            userRepository.findById(request.userId)
+                ?: throw NoSuchElementException("User not found with id: ${request.userId}")
+        val userResponse = UserResponse.from(user)
+
+        return CommentResponse.from(savedComment, userResponse)
     }
 
     override fun getComments(postId: Long): List<CommentResponse> {
@@ -51,7 +61,19 @@ class PostDetailServiceImpl(
         }
 
         val comments = postDetailRepository.findCommentsByPostIdOrderByCreatedAtDesc(postId)
-        return comments.map { CommentResponse.from(it) }
+
+        // User 정보 배치 조회
+        val userIds = comments.map { it.userId }.distinct()
+        val users = userRepository.findAllById(userIds)
+        val userMap = users.associateBy { it.id!! }
+
+        return comments.map { comment ->
+            val user =
+                userMap[comment.userId]
+                    ?: throw NoSuchElementException("User not found with id: ${comment.userId}")
+            val userResponse = UserResponse.from(user)
+            CommentResponse.from(comment, userResponse)
+        }
     }
 
     // ========== Like 메서드 구현 ==========

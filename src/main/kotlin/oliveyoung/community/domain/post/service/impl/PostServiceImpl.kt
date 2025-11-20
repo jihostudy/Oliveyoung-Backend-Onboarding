@@ -72,7 +72,20 @@ class PostServiceImpl(
 
         // 4. 댓글 목록 조회 (PostDetailRepository 사용)
         val comments = postDetailRepository.findCommentsByPostIdOrderByCreatedAtDesc(postId)
-        val commentResponses = comments.map { CommentResponse.from(it) }
+
+        // 댓글 작성자 User 정보 배치 조회
+        val userIds = comments.map { it.userId }.distinct()
+        val users = userRepository.findAllById(userIds)
+        val userMap = users.associateBy { it.id!! }
+
+        val commentResponses =
+            comments.map { comment ->
+                val user =
+                    userMap[comment.userId]
+                        ?: throw NoSuchElementException("User not found with id: ${comment.userId}")
+                val userResponse = UserResponse.from(user)
+                CommentResponse.from(comment, userResponse)
+            }
 
         // 5. 댓글 수
         val commentCount = comments.size
