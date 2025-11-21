@@ -7,7 +7,7 @@ import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.post.dto.request.CreatePostRequest
 import oliveyoung.community.domain.post.dto.response.PostListResponse
 import oliveyoung.community.domain.post.dto.response.PostResponse
-import oliveyoung.community.domain.post.service.PostService
+import oliveyoung.community.domain.post.service.impl.PostService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*

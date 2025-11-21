@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import oliveyoung.community.common.dto.CursorPaginationParams
 import oliveyoung.community.common.response.ApiResponse
 import oliveyoung.community.domain.feed.dto.FeedResponse
-import oliveyoung.community.domain.feed.service.FeedService
+import oliveyoung.community.domain.feed.service.impl.FeedService
 import org.springframework.web.bind.annotation.*
 
 /**
