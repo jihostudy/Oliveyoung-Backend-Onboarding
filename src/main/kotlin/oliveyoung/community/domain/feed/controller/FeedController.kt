@@ -3,8 +3,8 @@ package oliveyoung.community.domain.feed.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import oliveyoung.community.common.dto.CursorPaginationParams
 import oliveyoung.community.common.response.ApiResponse
+import oliveyoung.community.common.response.pagination.cursor.CursorPaginationParams
 import oliveyoung.community.domain.feed.dto.FeedResponse
 import oliveyoung.community.domain.feed.service.impl.FeedService
 import org.springframework.web.bind.annotation.*

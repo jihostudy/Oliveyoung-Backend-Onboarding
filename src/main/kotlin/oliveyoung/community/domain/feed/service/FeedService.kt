@@ -1,7 +1,7 @@
 package oliveyoung.community.domain.feed.service.impl
 
-import oliveyoung.community.common.dto.CursorPaginationParams
-import oliveyoung.community.common.dto.CursorPaginationResponse
+import oliveyoung.community.common.response.pagination.cursor.CursorPaginationParams
+import oliveyoung.community.common.response.pagination.cursor.CursorPaginationResponse
 import oliveyoung.community.domain.feed.dto.FeedResponse
 import oliveyoung.community.domain.feed.repository.FeedRepository
 import oliveyoung.community.domain.post.dto.response.PostResponse

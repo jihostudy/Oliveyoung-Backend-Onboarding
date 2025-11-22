@@ -1,6 +1,6 @@
 package oliveyoung.community.domain.feed.dto
 
-import oliveyoung.community.common.dto.CursorPaginationResponse
+import oliveyoung.community.common.response.pagination.cursor.CursorPaginationResponse
 import oliveyoung.community.domain.post.dto.response.PostResponse
 
 /**
