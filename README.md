@@ -117,7 +117,8 @@ src/main/kotlin/oliveyoung/community/
 
 ### 데이터베이스 스키마
 
-(사진 추가 예정)
+<img width="1482" height="542" alt="image" src="https://github.com/user-attachments/assets/c4fe9dd6-cf49-441d-8b4b-157345a7b3db" />
+
 
 ### 테이블 관계
 
