@@ -1,4 +1,4 @@
-package oliveyoung.community.domain.feed.service.impl
+package oliveyoung.community.domain.feed.service
 
 import oliveyoung.community.common.response.pagination.cursor.CursorPaginationParams
 import oliveyoung.community.common.response.pagination.cursor.CursorPaginationResponse
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
- * FeedService 구현체
+ * FeedService
  *
  * 커서 기반 무한 스크롤 피드
  */
